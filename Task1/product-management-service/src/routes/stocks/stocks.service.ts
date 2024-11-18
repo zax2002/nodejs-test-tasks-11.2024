@@ -11,7 +11,10 @@ export async function createStock(
   kafkaProducer: FastifyInstance["kafka"]["producer"]
 ): Promise<Stock> {
   const stock = await prismaClient.stock.create({
-    data: request
+    data: request,
+    include: {
+      product: true
+    }
   });
 
   kafkaProducer.send({
@@ -20,10 +23,12 @@ export async function createStock(
       key: 'datakey',
       value: JSON.stringify({
         timestamp: Date.now(),
-        entity: 'stock',
-        action: 'created',
-        id: stock.id,
-        column: null,
+        shop_id: stock.shop_id,
+        plu: stock.product.plu,
+        action_type: 'created',
+        entity_type: 'stock',
+        entity_id: stock.id,
+        entity_column: null,
         value: stock,
       })
     }],
@@ -97,6 +102,9 @@ export async function changeStockAmount(
       [column]: {
         [operation]: amount
       }
+    },
+    include: {
+      product: true
     }
   }).catch((e) => {
     if (
@@ -115,10 +123,12 @@ export async function changeStockAmount(
       key: 'datakey',
       value: JSON.stringify({
         timestamp: Date.now(),
-        entity: 'stock',
-        action: 'updated',
-        id: stock.id,
-        column,
+        shop_id: stock.shop_id,
+        plu: stock.product.plu,
+        action_type: 'updated',
+        entity_type: 'stock',
+        entity_id: stock.id,
+        entity_column: column,
         value: stock[column],
       })
     }],

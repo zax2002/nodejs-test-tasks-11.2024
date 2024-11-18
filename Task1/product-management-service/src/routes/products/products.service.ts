@@ -18,10 +18,12 @@ export async function createProduct(
       key: 'datakey',
       value: JSON.stringify({
         timestamp: Date.now(),
-        entity: 'product',
-        action: 'created',
-        id: product.id,
-        column: null,
+        shop_id: null,
+        plu: product.plu,
+        action_type: 'created',
+        entity_type: 'product',
+        entity_id: product.id,
+        entity_column: null,
         value: product,
       })
     }],
