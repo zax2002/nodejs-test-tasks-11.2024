@@ -1,45 +1,43 @@
 ## Установка
 
 ```bash
-$ npm i
-$ cp sample.env .env
-```
-
-## Запуск БД
-
-```bash
-docker-compose up
+npm i
+cp sample.env .env
+npx prisma migrate deploy
 ```
 
 ## Запуск проекта
 
 ```bash
 # development
-$ npm run start
+npm run start
 
 # watch mode
-$ npm run start:dev
+npm run start:dev
 
 # production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm run start:prod
 ```
 
 ## Деплой
 
 ```bash
-$ npm install -g mau
-$ mau deploy
+npm install -g mau
+mau deploy
 ```
+
+## Эндпоинты
+
+`PATCH /api/resolveProblems` - установка флага в `false` и возврат количества в соответствии с ТЗ
+
+`PATCH /api/causeProblems?count=n` - устанавливает флаг проблем `n` случайным пользователям в `true`, для тестирования
+
+## ТЗ
+
+Нужно написать сервис, который работает с пользователями. В бд может быть более 1 миллиона пользователей (набить данными бд нужно самостоятельно. Например, написать миграцию, которая это сделает). Каждый пользователь имеет поля:
+- Имя
+- Фамилия
+- Возраст
+- Пол
+- проблемы: boolean // есть ли проблемы у пользователя
+Нужно сделать endpoint, который проставить флаг проблемы у пользователей в false и посчитает, сколько пользователей имело true в этом флаге. Этот сервис нужно реализовать на nestjs
