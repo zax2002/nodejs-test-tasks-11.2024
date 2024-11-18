@@ -46,15 +46,15 @@ services:
     depends_on:
       - zoo1
 
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    restart: "no"
-    ports:
-      - "9000:9000"
-    environment:
-      KAFKA_BROKERCONNECT: "kafka:19092"
-    depends_on:
-      - "kafka"
+  # kafdrop:
+  #   image: obsidiandynamics/kafdrop
+  #   restart: "no"
+  #   ports:
+  #     - "9000:9000"
+  #   environment:
+  #     KAFKA_BROKERCONNECT: "kafka:19092"
+  #   depends_on:
+  #     - "kafka"
 
 volumes:
   postgres:
