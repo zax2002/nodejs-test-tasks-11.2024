@@ -3,6 +3,7 @@ import AutoLoad, {AutoloadPluginOptions} from '@fastify/autoload';
 import { FastifyPluginAsync, FastifyServerOptions } from 'fastify';
 import { productsSchemas } from './routes/products/products.schema';
 import { stockSchemas } from './routes/stocks/stocks.schema';
+import fastifyKafkaJS from 'fastify-kafkajs';
 
 export interface AppOptions extends FastifyServerOptions, Partial<AutoloadPluginOptions> {
 
@@ -34,10 +35,20 @@ const app: FastifyPluginAsync<AppOptions> = async (
     options: opts
   })
 
+  if(process.env.KAFKA_ADDRESS === undefined)
+    throw new Error("Variable KAFKA_ADDRESS in not set");
+
+  fastify.register(fastifyKafkaJS, {
+    clientConfig: {
+        brokers: [process.env.KAFKA_ADDRESS],
+        clientId: 'product-management-service'
+    },
+  })
+
   for (const schema of [...productsSchemas, ...stockSchemas]) {
     fastify.addSchema(schema);
   }
-};
+}; 
 
 export default app;
 export { app, options }

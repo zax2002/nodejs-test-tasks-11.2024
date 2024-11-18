@@ -6,7 +6,7 @@ export async function productCreateHandler(
   request: FastifyRequest<{Body: ProductCreateRequest}>,
   reply: FastifyReply,
 ): Promise<ProductCreateResponse> {
-  const product = await createProduct(request.body);
+  const product = await createProduct(request.body, request.server.kafka.producer);
   
   return reply.code(201), product;
 }

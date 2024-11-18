@@ -18,7 +18,7 @@ export async function stocksCreateHandler(
   if (!(await isProductExists(request.body.product_id)))
     throw httpErrors.notFound('Product not found')
 
-  const stock = await createStock(request.body);
+  const stock = await createStock(request.body, request.server.kafka.producer);
 
   return reply.code(201), {
     id: stock.id
@@ -62,7 +62,8 @@ export async function stockChangeAmountHandler(
     request.body.product_id,
     request.params.action,
     request.params.type,
-    request.body.amount_by
+    request.body.amount_by,
+    request.server.kafka.producer
   );
 
   return { amount }  

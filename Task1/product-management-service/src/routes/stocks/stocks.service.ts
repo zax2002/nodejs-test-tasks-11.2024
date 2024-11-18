@@ -3,12 +3,33 @@ import { prismaClient } from "../../plugins/prisma";
 import { StockCreateRequest } from "./stocks.schema";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { httpErrors } from "@fastify/sensible";
+import { FastifyInstance } from "fastify";
 
 
-export async function createStock(request: StockCreateRequest): Promise<Stock> {
-  return await prismaClient.stock.create({
+export async function createStock(
+  request: StockCreateRequest,
+  kafkaProducer: FastifyInstance["kafka"]["producer"]
+): Promise<Stock> {
+  const stock = await prismaClient.stock.create({
     data: request
+  });
+
+  kafkaProducer.send({
+    topic: 'history-updates',
+    messages: [{
+      key: 'datakey',
+      value: JSON.stringify({
+        datetime: Date.now(),
+        entity: 'stock',
+        action: 'created',
+        id: stock.id,
+        column: null,
+        value: stock,
+      })
+    }],
   })
+
+  return stock;
 }
 
 export async function isStockExists(shopId: number, productId: number): Promise<boolean> {
@@ -55,7 +76,8 @@ export async function changeStockAmount(
   productId: number | undefined,
   action: 'increment' | 'decrement',
   type: 'shelf' | 'order',
-  amount: number
+  amount: number,
+  kafkaProducer: FastifyInstance["kafka"]["producer"]
 ): Promise<number> {
   const column = type === "shelf" ? "amount_shelf" : "amount_order";
   const operation = action;
@@ -86,6 +108,21 @@ export async function changeStockAmount(
   
     throw e
   });
+
+  kafkaProducer.send({
+    topic: 'history-updates',
+    messages: [{
+      key: 'datakey',
+      value: JSON.stringify({
+        datetime: Date.now(),
+        entity: 'stock',
+        action: 'updated',
+        id: stock.id,
+        column,
+        value: stock[column],
+      })
+    }],
+  })
 
   return stock[column];
 }
