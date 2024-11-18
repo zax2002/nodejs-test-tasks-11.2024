@@ -19,7 +19,7 @@ export async function createStock(
     messages: [{
       key: 'datakey',
       value: JSON.stringify({
-        datetime: Date.now(),
+        timestamp: Date.now(),
         entity: 'stock',
         action: 'created',
         id: stock.id,
@@ -114,7 +114,7 @@ export async function changeStockAmount(
     messages: [{
       key: 'datakey',
       value: JSON.stringify({
-        datetime: Date.now(),
+        timestamp: Date.now(),
         entity: 'stock',
         action: 'updated',
         id: stock.id,

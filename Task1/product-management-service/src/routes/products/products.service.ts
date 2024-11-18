@@ -17,7 +17,7 @@ export async function createProduct(
     messages: [{
       key: 'datakey',
       value: JSON.stringify({
-        datetime: Date.now(),
+        timestamp: Date.now(),
         entity: 'product',
         action: 'created',
         id: product.id,
